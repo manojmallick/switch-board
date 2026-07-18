@@ -1,4 +1,18 @@
 export { demoVentures } from "./demo-ventures";
+export {
+  buildReentryDataPrompt,
+  createFallbackReentryBriefing,
+  createReentryRequest,
+  REENTRY_SYSTEM_INSTRUCTIONS,
+  ReentryBriefingEnvelopeSchema,
+  ReentryBriefingSchema,
+  ReentryRequestSchema,
+} from "./reentry-briefing";
+export type {
+  ReentryBriefing,
+  ReentryBriefingEnvelope,
+  ReentryRequest,
+} from "./reentry-briefing";
 export { getPendingTaskCount, summarizePortfolio } from "./ventures";
 export {
   computeSwitchCost,
