@@ -57,7 +57,7 @@ export default function Home() {
             <p className="eyebrow">Venture lines</p>
             <h2 id="board-title">Choose where your attention goes</h2>
           </div>
-          <p>Foundation preview · v0.1.0</p>
+          <p>Measurement core · v0.2.0</p>
         </div>
 
         <div className="venture-list">
