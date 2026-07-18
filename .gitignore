@@ -6,5 +6,6 @@ node_modules
 *.log
 *.tsbuildinfo
 .context
+.playwright-cli
 gain-report.json
 benchmarks/reports
