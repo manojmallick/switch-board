@@ -1,5 +1,16 @@
 export { demoVentures } from "./demo-ventures";
 export { getPendingTaskCount, summarizePortfolio } from "./ventures";
+export {
+  computeSwitchCost,
+  DEFAULT_SWITCH_COST_ASSUMPTIONS,
+  formatCostSummary,
+} from "./switch-cost";
+export type {
+  SwitchCostAssumptions,
+  SwitchCostResult,
+  SwitchCostTimelineEntry,
+  SwitchEvent,
+} from "./switch-cost";
 export type {
   PortfolioSummary,
   Venture,
