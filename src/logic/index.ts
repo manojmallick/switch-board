@@ -11,6 +11,8 @@ export type {
   SwitchCostTimelineEntry,
   SwitchEvent,
 } from "./switch-cost";
+export { createSwitchSession, plugIntoVenture, resetSwitchSession } from "./switch-session";
+export type { PlugInResult, SwitchSession } from "./switch-session";
 export type {
   PortfolioSummary,
   Venture,

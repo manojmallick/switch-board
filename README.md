@@ -51,7 +51,7 @@ for cold entries, and a cold threshold of more than four hours. A first entry in
 seen in the supplied event history is cold; exactly four hours is warm. These values are an
 adjustable planning model—not a scientific measurement of time actually lost.
 
-## v0.2.0 scope
+## v0.3.0 scope
 
 - Reproducible Next.js and TypeScript scaffold
 - Typed venture, note, and task domain models
@@ -59,11 +59,14 @@ adjustable planning model—not a scientific measurement of time actually lost.
 - Credential-free foundation screen
 - Pure, tested switch-cost estimator and per-switch timeline
 - Reproducible simulated-workday benchmark with documented real output
+- Interactive venture plug-in controls with one active line
+- Duplicate-safe local session events and live switch-cost totals
+- Recent warm/cold transition history and session reset
 - CI gates for linting, types, tests, and production build
 - Environment template with no secrets
 
-Interactive switching, persistence, and AI briefings are intentionally reserved for later
-versions.
+Persistence and AI briefings are intentionally reserved for later versions. v0.3.0 session data
+exists only in the current browser tab and resets when the page reloads.
 
 ## Project structure
 

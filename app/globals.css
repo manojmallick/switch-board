@@ -158,6 +158,73 @@ h1 {
   font-size: 0.8rem;
 }
 
+.session-toolbar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #f4f0e7;
+}
+
+.session-metrics {
+  display: flex;
+  align-items: center;
+}
+
+.session-metrics div {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 2px 22px;
+}
+
+.session-metrics div:first-child {
+  padding-left: 8px;
+}
+
+.session-metrics div + div {
+  border-left: 1px solid var(--line);
+}
+
+.session-metrics strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.7rem;
+  font-weight: 500;
+}
+
+.session-metrics span {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.reset-button {
+  padding: 9px 13px;
+  border: 1px solid #bbb4a7;
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.reset-button:hover,
+.reset-button:focus-visible {
+  border-color: var(--ink);
+}
+
+.reset-button:focus-visible {
+  outline: 3px solid rgb(240 109 69 / 30%);
+  outline-offset: 3px;
+}
+
 .venture-list {
   display: grid;
   gap: 12px;
@@ -179,6 +246,11 @@ h1 {
 .venture-card:hover {
   border-color: #b9b2a5;
   transform: translateY(-2px);
+}
+
+.venture-card.connected {
+  border-color: #7e9b92;
+  box-shadow: inset 4px 0 #3f806c;
 }
 
 .line-indicator {
@@ -276,7 +348,7 @@ h1 {
   content: "·";
 }
 
-.venture-card button {
+.plug-button {
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -290,15 +362,91 @@ h1 {
   font-weight: 800;
 }
 
-.venture-card button:hover,
-.venture-card button:focus-visible {
+.plug-button:hover:not(:disabled),
+.plug-button:focus-visible {
   background: var(--ink);
   color: white;
 }
 
-.venture-card button:focus-visible {
+.plug-button:focus-visible {
   outline: 3px solid rgb(240 109 69 / 30%);
   outline-offset: 3px;
+}
+
+.plug-button:disabled {
+  border-color: #b9cec6;
+  background: #e4f3eb;
+  color: #287555;
+  cursor: default;
+}
+
+.switch-history {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.35fr) 1fr;
+  gap: 28px;
+  margin-top: 20px;
+  padding: 24px 4px 2px;
+  border-top: 1px solid var(--line);
+}
+
+.switch-history h3 {
+  margin-bottom: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.history-empty {
+  align-self: center;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.87rem;
+}
+
+.switch-history ol {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.switch-history li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f4f0e7;
+  color: var(--ink);
+  font-size: 0.78rem;
+}
+
+.switch-history li > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.switch-history b {
+  color: #a29b8f;
+}
+
+.switch-history em {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.switch-history em.cold {
+  color: #a04d33;
+}
+
+.switch-history em.warm {
+  color: #287555;
 }
 
 @media (max-width: 760px) {
@@ -311,6 +459,28 @@ h1 {
   .board-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .session-toolbar,
+  .switch-history {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .session-metrics {
+    justify-content: space-between;
+  }
+
+  .session-metrics div {
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    padding: 2px 12px;
+  }
+
+  .session-metrics div:first-child {
+    padding-left: 0;
   }
 
   .summary-grid {
@@ -339,9 +509,15 @@ h1 {
     height: 42px;
   }
 
-  .venture-card button {
+  .plug-button {
     grid-column: 2;
     justify-self: start;
+  }
+
+  .switch-history li {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .venture-title-row,
