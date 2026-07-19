@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import {
   computeSwitchCost,
+  createDemoWorkdaySession,
   createDailyCloseoutRequest,
   createFallbackDailyCloseout,
   createFallbackPriorityMerge,
@@ -12,6 +13,7 @@ import {
   createReentryRequest,
   createSwitchSession,
   DailyCloseoutEnvelopeSchema,
+  DEMO_WORKDAY_EVENTS,
   getPendingTaskCount,
   plugIntoVenture,
   PriorityMergeEnvelopeSchema,
@@ -47,6 +49,11 @@ type PriorityState =
   | { readonly status: "loading" }
   | { readonly status: "ready"; readonly envelope: PriorityMergeEnvelope };
 
+type DemoState =
+  | { readonly status: "idle" }
+  | { readonly status: "running"; readonly eventCount: number }
+  | { readonly status: "complete"; readonly eventCount: number };
+
 function formatLastTouched(value: string | null): string {
   if (!value) return "Not touched yet";
 
@@ -70,6 +77,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
   const [briefingState, setBriefingState] = useState<BriefingState>({ status: "idle" });
   const [closeoutState, setCloseoutState] = useState<CloseoutState>({ status: "idle" });
   const [priorityState, setPriorityState] = useState<PriorityState>({ status: "idle" });
+  const [demoState, setDemoState] = useState<DemoState>({ status: "idle" });
   const briefingRequestId = useRef(0);
   const measurement = useMemo(() => computeSwitchCost(session.events), [session.events]);
   const ventureNames = useMemo(
@@ -77,11 +85,35 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
     [ventures],
   );
 
+  useEffect(() => {
+    if (demoState.status !== "running") return;
+
+    const timer = window.setTimeout(() => {
+      const nextEventCount = demoState.eventCount + 1;
+      setSession(createDemoWorkdaySession(nextEventCount));
+      setDemoState(
+        nextEventCount === DEMO_WORKDAY_EVENTS.length
+          ? { status: "complete", eventCount: nextEventCount }
+          : { status: "running", eventCount: nextEventCount },
+      );
+    }, 260);
+
+    return () => window.clearTimeout(timer);
+  }, [demoState]);
+
   async function handlePlugIn(ventureId: string): Promise<void> {
     const venture = ventures.find((candidate) => candidate.id === ventureId);
     if (!venture) return;
 
-    setSession((current) => plugIntoVenture(current, ventureId, Date.now()).session);
+    setSession((current) => {
+      const switchedAt = Date.now();
+      const sessionForSwitch =
+        demoState.status === "idle"
+          ? current
+          : createSwitchSession(initialVenture.id, switchedAt);
+      return plugIntoVenture(sessionForSwitch, ventureId, switchedAt).session;
+    });
+    setDemoState({ status: "idle" });
     const requestId = briefingRequestId.current + 1;
     briefingRequestId.current = requestId;
     setBriefingState({ status: "loading", ventureName: venture.name });
@@ -121,6 +153,16 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
     setBriefingState({ status: "idle" });
     setCloseoutState({ status: "idle" });
     setPriorityState({ status: "idle" });
+    setDemoState({ status: "idle" });
+  }
+
+  function handleRunDemo(): void {
+    briefingRequestId.current += 1;
+    setBriefingState({ status: "idle" });
+    setCloseoutState({ status: "idle" });
+    setPriorityState({ status: "idle" });
+    setSession(createDemoWorkdaySession(1));
+    setDemoState({ status: "running", eventCount: 1 });
   }
 
   async function handleMergePriorities(): Promise<void> {
@@ -187,7 +229,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           <p className="eyebrow">Venture lines</p>
           <h2 id="board-title">Choose where your attention goes</h2>
         </div>
-        <p>Priority merge · v0.6.0</p>
+        <p>Judge demo · v0.6.1</p>
       </div>
 
       <div className="session-toolbar">
@@ -206,6 +248,18 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           </div>
         </div>
         <div className="session-actions">
+          <button
+            className="demo-workday-button"
+            type="button"
+            onClick={handleRunDemo}
+            disabled={demoState.status === "running"}
+          >
+            {demoState.status === "running"
+              ? `Replaying ${demoState.eventCount}/${DEMO_WORKDAY_EVENTS.length}`
+              : demoState.status === "complete"
+                ? "Replay demo workday"
+                : "Run demo workday"}
+          </button>
           <button className="priority-merge-button" type="button" onClick={() => void handleMergePriorities()}>
             Merge priorities
           </button>
@@ -217,6 +271,22 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           </button>
         </div>
       </div>
+
+      {demoState.status !== "idle" && (
+        <section className={`demo-strip ${demoState.status}`} aria-live="polite" aria-atomic="true">
+          <div>
+            <span>Judge demo · fictional workday</span>
+            <strong>
+              {demoState.status === "running"
+                ? `Replaying entry ${demoState.eventCount} of ${DEMO_WORKDAY_EVENTS.length}`
+                : "Measured result: 6 switches · 2 cold · 74 estimated minutes"}
+            </strong>
+          </div>
+          <progress value={demoState.eventCount} max={DEMO_WORKDAY_EVENTS.length}>
+            {demoState.eventCount} of {DEMO_WORKDAY_EVENTS.length}
+          </progress>
+        </section>
+      )}
 
       {priorityState.status !== "idle" ? (
         <section className="priority-screen" aria-labelledby="priority-title" aria-live="polite">
@@ -413,7 +483,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           <ol>
             {[...measurement.timeline]
               .reverse()
-              .slice(0, 3)
+              .slice(0, demoState.status === "complete" ? measurement.timeline.length : 3)
               .map((entry, index) => (
                 <li key={`${entry.timestamp}-${entry.ventureId}-${index}`}>
                   <span>

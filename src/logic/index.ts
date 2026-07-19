@@ -1,5 +1,11 @@
 export { demoVentures } from "./demo-ventures";
 export {
+  createDemoWorkdaySession,
+  DEMO_WORKDAY_EVENTS,
+  DEMO_WORKDAY_RESULT,
+  DEMO_WORKDAY_STARTED_AT,
+} from "./demo-workday";
+export {
   buildPriorityMergeDataPrompt,
   createFallbackPriorityMerge,
   createPriorityMergeRequest,
