@@ -9,20 +9,25 @@ import {
   createFallbackDailyCloseout,
   createFallbackPriorityMerge,
   createFallbackReentryBriefing,
+  createFallbackSwitchPlan,
   createPriorityMergeRequest,
   createReentryRequest,
+  createSwitchPlannerRequest,
   createSwitchSession,
   DailyCloseoutEnvelopeSchema,
   DEMO_WORKDAY_EVENTS,
+  evaluateSwitchPlan,
   getPendingTaskCount,
   plugIntoVenture,
   PriorityMergeEnvelopeSchema,
   resetSwitchSession,
   ReentryBriefingEnvelopeSchema,
+  SwitchPlannerEnvelopeSchema,
   type DailyCloseoutEnvelope,
   type DailyCloseoutRequest,
   type PriorityMergeEnvelope,
   type ReentryBriefingEnvelope,
+  type SwitchPlannerEnvelope,
   type Venture,
 } from "@/src/logic";
 
@@ -54,6 +59,11 @@ type DemoState =
   | { readonly status: "running"; readonly eventCount: number }
   | { readonly status: "complete"; readonly eventCount: number };
 
+type PlannerState =
+  | { readonly status: "idle" }
+  | { readonly status: "loading" }
+  | { readonly status: "ready"; readonly envelope: SwitchPlannerEnvelope };
+
 function formatLastTouched(value: string | null): string {
   if (!value) return "Not touched yet";
 
@@ -62,6 +72,11 @@ function formatLastTouched(value: string | null): string {
     timeStyle: "short",
     timeZone: "Europe/Amsterdam",
   }).format(new Date(value));
+}
+
+function formatSwitchDifference(value: number): string {
+  if (value === 0) return "the same number of switches";
+  return `${Math.abs(value)} ${value > 0 ? "fewer" : "more"} switches`;
 }
 
 export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }) {
@@ -78,6 +93,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
   const [closeoutState, setCloseoutState] = useState<CloseoutState>({ status: "idle" });
   const [priorityState, setPriorityState] = useState<PriorityState>({ status: "idle" });
   const [demoState, setDemoState] = useState<DemoState>({ status: "idle" });
+  const [plannerState, setPlannerState] = useState<PlannerState>({ status: "idle" });
   const briefingRequestId = useRef(0);
   const measurement = useMemo(() => computeSwitchCost(session.events), [session.events]);
   const ventureNames = useMemo(
@@ -114,6 +130,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
       return plugIntoVenture(sessionForSwitch, ventureId, switchedAt).session;
     });
     setDemoState({ status: "idle" });
+    setPlannerState({ status: "idle" });
     const requestId = briefingRequestId.current + 1;
     briefingRequestId.current = requestId;
     setBriefingState({ status: "loading", ventureName: venture.name });
@@ -154,6 +171,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
     setCloseoutState({ status: "idle" });
     setPriorityState({ status: "idle" });
     setDemoState({ status: "idle" });
+    setPlannerState({ status: "idle" });
   }
 
   function handleRunDemo(): void {
@@ -161,8 +179,37 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
     setBriefingState({ status: "idle" });
     setCloseoutState({ status: "idle" });
     setPriorityState({ status: "idle" });
+    setPlannerState({ status: "idle" });
     setSession(createDemoWorkdaySession(1));
     setDemoState({ status: "running", eventCount: 1 });
+  }
+
+  async function handlePlanSwitches(): Promise<void> {
+    if (measurement.totalSwitches < 3) return;
+
+    const request = createSwitchPlannerRequest(session, ventures);
+    setPlannerState({ status: "loading" });
+
+    try {
+      const response = await fetch("/api/switch-plan", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(request),
+      });
+      if (!response.ok) throw new Error("Switch planner request failed.");
+
+      const envelope = SwitchPlannerEnvelopeSchema.parse(await response.json());
+      setPlannerState({ status: "ready", envelope });
+    } catch {
+      setPlannerState({
+        status: "ready",
+        envelope: {
+          result: evaluateSwitchPlan(request, createFallbackSwitchPlan(request)),
+          source: "fallback",
+          notice: "Network planner unavailable; showing local grouped fallback.",
+        },
+      });
+    }
   }
 
   async function handleMergePriorities(): Promise<void> {
@@ -229,7 +276,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           <p className="eyebrow">Venture lines</p>
           <h2 id="board-title">Choose where your attention goes</h2>
         </div>
-        <p>Judge demo · v0.6.1</p>
+        <p>Switch planner · v0.6.2</p>
       </div>
 
       <div className="session-toolbar">
@@ -260,6 +307,15 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
                 ? "Replay demo workday"
                 : "Run demo workday"}
           </button>
+          <button
+            className="switch-planner-button"
+            type="button"
+            onClick={() => void handlePlanSwitches()}
+            disabled={measurement.totalSwitches < 3 || demoState.status === "running"}
+            title={measurement.totalSwitches < 3 ? "Run the demo workday or record at least three switches first." : undefined}
+          >
+            {measurement.totalSwitches < 3 ? "Planner needs 3 switches" : "Plan fewer switches"}
+          </button>
           <button className="priority-merge-button" type="button" onClick={() => void handleMergePriorities()}>
             Merge priorities
           </button>
@@ -288,7 +344,70 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
         </section>
       )}
 
-      {priorityState.status !== "idle" ? (
+      {plannerState.status !== "idle" ? (
+        <section className="planner-screen" aria-labelledby="planner-title" aria-live="polite">
+          <div className="planner-heading">
+            <div>
+              <p className="eyebrow">Read-only counterfactual</p>
+              <h3 id="planner-title">A lower-switch workday</h3>
+              <p>Projected with one-hour venture-block spacing and the same estimator assumptions.</p>
+            </div>
+            {plannerState.status === "ready" && (
+              <span className={`briefing-source ${plannerState.envelope.source}`}>
+                {plannerState.envelope.source === "ai" ? "AI sequence" : "Grouped fallback"}
+              </span>
+            )}
+          </div>
+
+          {plannerState.status === "loading" ? (
+            <div className="briefing-loading" role="status">
+              <span aria-hidden="true" />Planning fewer venture transitions…
+            </div>
+          ) : (
+            <>
+              <div className="planner-comparison">
+                <article>
+                  <span>Recorded baseline</span>
+                  <strong>{plannerState.envelope.result.baseline.totalSwitches} switches</strong>
+                  <p>{plannerState.envelope.result.baseline.estimatedMinutes} estimated minutes · {plannerState.envelope.result.baseline.coldSwitches} cold</p>
+                </article>
+                <b aria-hidden="true">→</b>
+                <article>
+                  <span>Proposed blocks</span>
+                  <strong>{plannerState.envelope.result.proposed.totalSwitches} switches</strong>
+                  <p>{plannerState.envelope.result.proposed.estimatedMinutes} estimated minutes · {plannerState.envelope.result.proposed.coldSwitches} cold</p>
+                </article>
+              </div>
+              <div className="planner-difference">
+                <strong>{Math.abs(plannerState.envelope.result.projectedMinuteDifference)} minutes</strong>
+                <span>
+                  {plannerState.envelope.result.projectedMinuteDifference === 0
+                    ? "same projected re-orientation budget"
+                    : `${plannerState.envelope.result.projectedMinuteDifference > 0 ? "lower" : "higher"} projected re-orientation budget`}
+                  {" · "}{formatSwitchDifference(plannerState.envelope.result.projectedSwitchDifference)}
+                </span>
+              </div>
+              <ol className="planner-blocks">
+                {plannerState.envelope.result.blocks.map((block, index) => (
+                  <li key={`${block.ventureId}-${index}`}>
+                    <strong>{index + 1}</strong>
+                    <div>
+                      <span>{block.ventureName}</span>
+                      <ul>{block.tasks.map((task) => <li key={task}>{task}</li>)}</ul>
+                      <p>{block.rationale}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              {plannerState.envelope.notice && <p className="planner-notice">{plannerState.envelope.notice}</p>}
+            </>
+          )}
+
+          <button className="back-board-button" type="button" onClick={() => setPlannerState({ status: "idle" })}>
+            Back to the unchanged switchboard
+          </button>
+        </section>
+      ) : priorityState.status !== "idle" ? (
         <section className="priority-screen" aria-labelledby="priority-title" aria-live="polite">
           <div className="priority-heading">
             <div>

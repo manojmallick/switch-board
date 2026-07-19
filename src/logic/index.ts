@@ -62,6 +62,24 @@ export type {
 } from "./switch-cost";
 export { createSwitchSession, plugIntoVenture, resetSwitchSession } from "./switch-session";
 export type { PlugInResult, SwitchSession } from "./switch-session";
+export {
+  buildSwitchPlannerDataPrompt,
+  createFallbackSwitchPlan,
+  createSwitchPlannerRequest,
+  evaluateSwitchPlan,
+  isValidSwitchPlan,
+  SWITCH_PLANNER_SYSTEM_INSTRUCTIONS,
+  SwitchPlannerEnvelopeSchema,
+  SwitchPlannerProposalSchema,
+  SwitchPlannerRequestSchema,
+  SwitchPlannerResultSchema,
+} from "./switch-planner";
+export type {
+  SwitchPlannerEnvelope,
+  SwitchPlannerProposal,
+  SwitchPlannerRequest,
+  SwitchPlannerResult,
+} from "./switch-planner";
 export type {
   PortfolioSummary,
   Venture,
