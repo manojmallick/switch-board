@@ -6,6 +6,9 @@ key and includes a deterministic measurement core for venture switches.
 
 Built for OpenAI Build Week 2026 in the Work & Productivity track.
 
+Submission evidence, the concise demo sequence, and the remaining manual checklist are in
+[`SUBMISSION_CANDIDATE.md`](./SUBMISSION_CANDIDATE.md).
+
 ## Requirements
 
 - Node.js 24
@@ -72,6 +75,13 @@ If credentials or the provider are unavailable, the API returns the same three-p
 using a deterministic fallback. Venture notes are treated as untrusted data and the integration
 never executes actions from generated content.
 
+## Read-Only Guarantee
+
+Switchboard's AI layer is informational. A shared server-side guard permits only four declared
+capabilities—briefing, ranking, planning, and narration—before an OpenAI request can be made.
+Unknown or write-like capabilities are rejected. The product does not expose AI tools for
+completing tasks, sending messages, scheduling events, or changing venture data.
+
 ## Daily closeout
 
 “Close the boards” turns the current in-tab session into an end-of-day snapshot: lines visited,
@@ -115,7 +125,7 @@ warm/cold reason to every measured transition. The contribution sum is shown bef
 whole-minute rounding step, so the fictional judge workday transparently shows 73.8 minutes
 becoming the displayed 74-minute estimate. A zero-switch session never invents transition rows.
 
-## v0.6.3 scope
+## v0.7.0 submission-candidate scope
 
 - Reproducible Next.js and TypeScript scaffold
 - Typed venture, note, and task domain models
@@ -141,10 +151,14 @@ becoming the displayed 74-minute estimate. A zero-switch session never invents t
 - Independently scored baseline/proposal comparison with deterministic fallback
 - Accessible, collapsed measurement formula and per-transition explanation
 - Explicit contribution sum and final display-rounding evidence
+- Shared, tested Read-Only Guarantee across all four AI routes
+- Visible governance promise in the product header
+- Reproducible submission evidence, real challenge notes, and manual handoff checklist
+- MIT license
 - CI gates for linting, types, tests, and production build
 - Environment template with no secrets
 
-Persistence is intentionally reserved for later versions. v0.6.3 session data exists only in
+Persistence is intentionally reserved for later versions. v0.7.0 session data exists only in
 the current browser tab and resets when the page reloads.
 
 ## Project structure
@@ -154,6 +168,7 @@ the current browser tab and resets when the page reloads.
 - `scripts/` — deterministic benchmark entrypoints
 - `lib/seo/` — shared metadata helpers from the universal scaffold
 - `SWITCHBOARD_PRODUCTIVITY_PLAN.md` — product and submission plan
+- `SUBMISSION_CANDIDATE.md` — verified evidence, demo sequence, and manual submission checklist
 
 The project was generated with the local `create-universal-app` `web-nextjs` platform. Deploy,
 SEO, CI, and SigMap wiring are included. Vercel configuration lives in `vercel.ts`.

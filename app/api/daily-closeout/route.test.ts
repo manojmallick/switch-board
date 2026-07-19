@@ -9,7 +9,11 @@ import {
   DailyCloseoutNarrativeSchema,
 } from "../../../src/logic/daily-closeout";
 import { createSwitchSession } from "../../../src/logic/switch-session";
-import { POST } from "./route";
+import { AI_CAPABILITY, POST } from "./route";
+
+test("declares the narrate-only AI capability", () => {
+  assert.equal(AI_CAPABILITY, "narrate");
+});
 
 function validRequest() {
   return createDailyCloseoutRequest(

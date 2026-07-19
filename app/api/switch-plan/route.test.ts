@@ -9,7 +9,11 @@ import {
   SwitchPlannerEnvelopeSchema,
   SwitchPlannerProposalSchema,
 } from "../../../src/logic/switch-planner";
-import { POST } from "./route";
+import { AI_CAPABILITY, POST } from "./route";
+
+test("declares the plan-only AI capability", () => {
+  assert.equal(AI_CAPABILITY, "plan");
+});
 
 const input = createSwitchPlannerRequest(createDemoWorkdaySession(), demoVentures);
 

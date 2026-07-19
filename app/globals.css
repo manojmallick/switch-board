@@ -94,6 +94,23 @@ h1 {
   box-shadow: 0 0 0 4px rgb(61 163 123 / 12%);
 }
 
+.read-only-badge div {
+  display: grid;
+  gap: 2px;
+}
+
+.read-only-badge strong {
+  color: var(--ink);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.read-only-badge small {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

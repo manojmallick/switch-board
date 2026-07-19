@@ -15,9 +15,15 @@ export default function Home() {
             next.
           </p>
         </div>
-        <div className="read-only-badge" aria-label="Demo data mode">
+        <div
+          className="read-only-badge"
+          aria-label="Read-Only Guarantee: AI never changes tasks or sends anything"
+        >
           <span aria-hidden="true" />
-          Demo data · no credentials required
+          <div>
+            <strong>Read-Only Guarantee</strong>
+            <small>AI never changes tasks or sends anything</small>
+          </div>
         </div>
       </header>
 

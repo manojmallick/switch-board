@@ -49,6 +49,11 @@ export type {
   ReentryRequest,
 } from "./reentry-briefing";
 export { getPendingTaskCount, summarizePortfolio } from "./ventures";
+export {
+  assertReadOnlyCapability,
+  READ_ONLY_AI_CAPABILITIES,
+} from "./read-only-guarantee";
+export type { ReadOnlyAiCapability } from "./read-only-guarantee";
 export { explainSwitchCost } from "./measurement-explanation";
 export type {
   MeasurementClassification,

@@ -281,7 +281,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           <p className="eyebrow">Venture lines</p>
           <h2 id="board-title">Choose where your attention goes</h2>
         </div>
-        <p>Measurement explanation · v0.6.3</p>
+        <p>Submission candidate · v0.7.0</p>
       </div>
 
       <div className="session-toolbar">
