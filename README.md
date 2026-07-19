@@ -71,7 +71,17 @@ The server requests a short, structured narrative through the same server-only R
 boundary as re-entry briefings. Missing credentials and provider failures produce a deterministic,
 honest fallback, and “Start a fresh session” explicitly resets the local workday.
 
-## v0.5.0 scope
+## Cross-venture priority merge
+
+“Merge priorities” compares every pending task across the fictional venture lines and returns one
+ranked list with a short reason for each position. The AI path must return every task exactly once
+with its original identifier, venture, and title; incomplete or altered output is discarded.
+
+Without credentials—or if the provider fails—the same UI uses deterministic deadline ordering:
+earlier dated work first, undated work last, and source order as the stable tie-breaker. The ranking
+is informational and never completes tasks, sends messages, or changes venture data.
+
+## v0.6.0 scope
 
 - Reproducible Next.js and TypeScript scaffold
 - Typed venture, note, and task domain models
@@ -88,10 +98,13 @@ honest fallback, and “Start a fresh session” explicitly resets the local wor
 - Explicit daily closeout with visited-line and remaining-work context
 - Structured honest narrative with safe deterministic fallback
 - Fresh-session action after consciously closing the boards
+- Read-only cross-venture ranking of every pending task
+- Explainable AI ordering with strict completeness validation
+- Deterministic deadline fallback with stable tie-breaking
 - CI gates for linting, types, tests, and production build
 - Environment template with no secrets
 
-Persistence is intentionally reserved for later versions. v0.5.0 session data exists only in
+Persistence is intentionally reserved for later versions. v0.6.0 session data exists only in
 the current browser tab and resets when the page reloads.
 
 ## Project structure
