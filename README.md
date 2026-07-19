@@ -51,7 +51,17 @@ for cold entries, and a cold threshold of more than four hours. A first entry in
 seen in the supplied event history is cold; exactly four hours is warm. These values are an
 adjustable planning model—not a scientific measurement of time actually lost.
 
-## v0.3.0 scope
+## AI re-entry briefings
+
+When a user plugs into a different venture, Switchboard requests a structured landing checklist
+from the server-only OpenAI Responses API integration. The default model is `gpt-5.6-sol` and
+can be changed with `OPENAI_MODEL`. See the [official model documentation](https://developers.openai.com/api/docs/models/gpt-5.6-sol).
+
+If credentials or the provider are unavailable, the API returns the same three-part contract
+using a deterministic fallback. Venture notes are treated as untrusted data and the integration
+never executes actions from generated content.
+
+## v0.4.0 scope
 
 - Reproducible Next.js and TypeScript scaffold
 - Typed venture, note, and task domain models
@@ -62,11 +72,14 @@ adjustable planning model—not a scientific measurement of time actually lost.
 - Interactive venture plug-in controls with one active line
 - Duplicate-safe local session events and live switch-cost totals
 - Recent warm/cold transition history and session reset
+- Structured AI re-entry briefings on explicit venture switches
+- Loading, provenance, stale-response protection, and deterministic fallback states
+- Strict server validation and untrusted-data prompt isolation
 - CI gates for linting, types, tests, and production build
 - Environment template with no secrets
 
-Persistence and AI briefings are intentionally reserved for later versions. v0.3.0 session data
-exists only in the current browser tab and resets when the page reloads.
+Persistence is intentionally reserved for later versions. v0.4.0 session data exists only in
+the current browser tab and resets when the page reloads.
 
 ## Project structure
 

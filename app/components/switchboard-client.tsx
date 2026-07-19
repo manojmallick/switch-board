@@ -1,15 +1,28 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useRef, useState, type CSSProperties } from "react";
 
 import {
   computeSwitchCost,
+  createFallbackReentryBriefing,
+  createReentryRequest,
   createSwitchSession,
   getPendingTaskCount,
   plugIntoVenture,
   resetSwitchSession,
+  ReentryBriefingEnvelopeSchema,
+  type ReentryBriefingEnvelope,
   type Venture,
 } from "@/src/logic";
+
+type BriefingState =
+  | { readonly status: "idle" }
+  | { readonly status: "loading"; readonly ventureName: string }
+  | {
+      readonly status: "ready";
+      readonly ventureName: string;
+      readonly envelope: ReentryBriefingEnvelope;
+    };
 
 function formatLastTouched(value: string | null): string {
   if (!value) return "Not touched yet";
@@ -31,18 +44,56 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
   const [session, setSession] = useState(() =>
     createSwitchSession(initialVenture.id, Date.now()),
   );
+  const [briefingState, setBriefingState] = useState<BriefingState>({ status: "idle" });
+  const briefingRequestId = useRef(0);
   const measurement = useMemo(() => computeSwitchCost(session.events), [session.events]);
   const ventureNames = useMemo(
     () => new Map(ventures.map((venture) => [venture.id, venture.name])),
     [ventures],
   );
 
-  function handlePlugIn(ventureId: string): void {
+  async function handlePlugIn(ventureId: string): Promise<void> {
+    const venture = ventures.find((candidate) => candidate.id === ventureId);
+    if (!venture) return;
+
     setSession((current) => plugIntoVenture(current, ventureId, Date.now()).session);
+    const requestId = briefingRequestId.current + 1;
+    briefingRequestId.current = requestId;
+    setBriefingState({ status: "loading", ventureName: venture.name });
+
+    const input = createReentryRequest(venture);
+
+    try {
+      const response = await fetch("/api/reentry-briefing", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      if (!response.ok) throw new Error("Briefing request failed.");
+
+      const envelope = ReentryBriefingEnvelopeSchema.parse(await response.json());
+      if (briefingRequestId.current === requestId) {
+        setBriefingState({ status: "ready", ventureName: venture.name, envelope });
+      }
+    } catch {
+      if (briefingRequestId.current === requestId) {
+        setBriefingState({
+          status: "ready",
+          ventureName: venture.name,
+          envelope: {
+            briefing: createFallbackReentryBriefing(input),
+            source: "fallback",
+            notice: "Network briefing unavailable; showing local fallback.",
+          },
+        });
+      }
+    }
   }
 
   function handleReset(): void {
+    briefingRequestId.current += 1;
     setSession((current) => resetSwitchSession(current, Date.now()));
+    setBriefingState({ status: "idle" });
   }
 
   return (
@@ -52,7 +103,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           <p className="eyebrow">Venture lines</p>
           <h2 id="board-title">Choose where your attention goes</h2>
         </div>
-        <p>Usable switchboard · v0.3.0</p>
+        <p>AI re-entry · v0.4.0</p>
       </div>
 
       <div className="session-toolbar">
@@ -106,7 +157,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
               <button
                 className="plug-button"
                 type="button"
-                onClick={() => handlePlugIn(venture.id)}
+                onClick={() => void handlePlugIn(venture.id)}
                 disabled={isActive}
                 aria-label={isActive ? `${venture.name} is connected` : `Plug into ${venture.name}`}
               >
@@ -117,6 +168,58 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           );
         })}
       </div>
+
+      <section className="briefing-panel" aria-labelledby="briefing-title" aria-live="polite">
+        <div className="briefing-heading">
+          <div>
+            <p className="eyebrow">Landing checklist</p>
+            <h3 id="briefing-title">Re-entry briefing</h3>
+          </div>
+          {briefingState.status === "ready" && (
+            <span className={`briefing-source ${briefingState.envelope.source}`}>
+              {briefingState.envelope.source === "ai" ? "AI briefing" : "Safe fallback"}
+            </span>
+          )}
+        </div>
+
+        {briefingState.status === "idle" && (
+          <p className="briefing-empty">
+            Plug into another venture to generate a concise re-entry checklist.
+          </p>
+        )}
+
+        {briefingState.status === "loading" && (
+          <div className="briefing-loading" role="status">
+            <span aria-hidden="true" />
+            Preparing the {briefingState.ventureName} briefing…
+          </div>
+        )}
+
+        {briefingState.status === "ready" && (
+          <div className="briefing-content">
+            <p className="briefing-venture">Briefing for {briefingState.ventureName}</p>
+            <div className="briefing-since">
+              <h4>Since you left</h4>
+              <p>{briefingState.envelope.briefing.sinceYouLeft}</p>
+            </div>
+            <div className="briefing-priorities">
+              <h4>Top 3 to look at</h4>
+              <ol>
+                {briefingState.envelope.briefing.topPriorities.map((priority, index) => (
+                  <li key={`${index}-${priority}`}>{priority}</li>
+                ))}
+              </ol>
+            </div>
+            <div className="briefing-focus">
+              <span>One-line focus</span>
+              <strong>{briefingState.envelope.briefing.oneLineFocus}</strong>
+            </div>
+            {briefingState.envelope.notice && (
+              <p className="briefing-notice">{briefingState.envelope.notice}</p>
+            )}
+          </div>
+        )}
+      </section>
 
       <section className="switch-history" aria-labelledby="history-title">
         <div>
