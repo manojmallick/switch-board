@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "test": "tsx --test src/logic/**/*.test.ts app/api/**/*.test.ts",
     "benchmark:switch-cost": "tsx scripts/simulate-workday.ts",
+    "verify:release-artifacts": "tsx scripts/verify-release-artifacts.ts",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "postinstall": "sigmap",
     "map:refresh": "sigmap",

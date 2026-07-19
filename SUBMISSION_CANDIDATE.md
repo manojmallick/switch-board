@@ -91,3 +91,5 @@ back to stable grouping.
 - [ ] Select **Work & Productivity** and confirm all required Devpost fields.
 - [ ] Verify the repository visibility and submit before the deadline.
 
+The final `v1.0.0` tag is additionally blocked on the public-artifact and manual checks in
+[`RELEASE_V1.md`](./RELEASE_V1.md). Until those checks pass, version 0.7.0 is intentional.

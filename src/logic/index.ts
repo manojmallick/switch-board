@@ -54,6 +54,12 @@ export {
   READ_ONLY_AI_CAPABILITIES,
 } from "./read-only-guarantee";
 export type { ReadOnlyAiCapability } from "./read-only-guarantee";
+export { verifyReleaseArtifacts } from "./release-artifacts";
+export type {
+  ArtifactFetcher,
+  ReleaseArtifactUrls,
+  VerifiedReleaseArtifacts,
+} from "./release-artifacts";
 export { explainSwitchCost } from "./measurement-explanation";
 export type {
   MeasurementClassification,
