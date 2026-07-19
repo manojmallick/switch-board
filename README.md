@@ -8,6 +8,8 @@ Built for OpenAI Build Week 2026 in the Work & Productivity track.
 
 Submission evidence, the concise demo sequence, and the remaining manual checklist are in
 [`SUBMISSION_CANDIDATE.md`](./SUBMISSION_CANDIDATE.md).
+The [`v1.0.0 release gate`](./RELEASE_V1.md) intentionally blocks tagging until the final live
+application and public demo video have both been verified.
 
 ## Requirements
 
@@ -169,6 +171,7 @@ the current browser tab and resets when the page reloads.
 - `lib/seo/` — shared metadata helpers from the universal scaffold
 - `SWITCHBOARD_PRODUCTIVITY_PLAN.md` — product and submission plan
 - `SUBMISSION_CANDIDATE.md` — verified evidence, demo sequence, and manual submission checklist
+- `RELEASE_V1.md` — mandatory live-URL and video checks before the v1.0.0 tag
 
 The project was generated with the local `create-universal-app` `web-nextjs` platform. Deploy,
 SEO, CI, and SigMap wiring are included. Vercel configuration lives in `vercel.ts`.
