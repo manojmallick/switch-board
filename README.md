@@ -61,7 +61,17 @@ If credentials or the provider are unavailable, the API returns the same three-p
 using a deterministic fallback. Venture notes are treated as untrusted data and the integration
 never executes actions from generated content.
 
-## v0.4.0 scope
+## Daily closeout
+
+“Close the boards” turns the current in-tab session into an end-of-day snapshot: lines visited,
+entry counts, remaining work, and the same switch/cold/cost measurement shown during the day.
+The closeout does not add an event or infer that any task was completed.
+
+The server requests a short, structured narrative through the same server-only Responses API
+boundary as re-entry briefings. Missing credentials and provider failures produce a deterministic,
+honest fallback, and “Start a fresh session” explicitly resets the local workday.
+
+## v0.5.0 scope
 
 - Reproducible Next.js and TypeScript scaffold
 - Typed venture, note, and task domain models
@@ -75,10 +85,13 @@ never executes actions from generated content.
 - Structured AI re-entry briefings on explicit venture switches
 - Loading, provenance, stale-response protection, and deterministic fallback states
 - Strict server validation and untrusted-data prompt isolation
+- Explicit daily closeout with visited-line and remaining-work context
+- Structured honest narrative with safe deterministic fallback
+- Fresh-session action after consciously closing the boards
 - CI gates for linting, types, tests, and production build
 - Environment template with no secrets
 
-Persistence is intentionally reserved for later versions. v0.4.0 session data exists only in
+Persistence is intentionally reserved for later versions. v0.5.0 session data exists only in
 the current browser tab and resets when the page reloads.
 
 ## Project structure

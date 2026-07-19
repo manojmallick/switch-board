@@ -4,13 +4,18 @@ import { useMemo, useRef, useState, type CSSProperties } from "react";
 
 import {
   computeSwitchCost,
+  createDailyCloseoutRequest,
+  createFallbackDailyCloseout,
   createFallbackReentryBriefing,
   createReentryRequest,
   createSwitchSession,
+  DailyCloseoutEnvelopeSchema,
   getPendingTaskCount,
   plugIntoVenture,
   resetSwitchSession,
   ReentryBriefingEnvelopeSchema,
+  type DailyCloseoutEnvelope,
+  type DailyCloseoutRequest,
   type ReentryBriefingEnvelope,
   type Venture,
 } from "@/src/logic";
@@ -22,6 +27,15 @@ type BriefingState =
       readonly status: "ready";
       readonly ventureName: string;
       readonly envelope: ReentryBriefingEnvelope;
+    };
+
+type CloseoutState =
+  | { readonly status: "idle" }
+  | { readonly status: "loading"; readonly request: DailyCloseoutRequest }
+  | {
+      readonly status: "ready";
+      readonly request: DailyCloseoutRequest;
+      readonly envelope: DailyCloseoutEnvelope;
     };
 
 function formatLastTouched(value: string | null): string {
@@ -45,6 +59,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
     createSwitchSession(initialVenture.id, Date.now()),
   );
   const [briefingState, setBriefingState] = useState<BriefingState>({ status: "idle" });
+  const [closeoutState, setCloseoutState] = useState<CloseoutState>({ status: "idle" });
   const briefingRequestId = useRef(0);
   const measurement = useMemo(() => computeSwitchCost(session.events), [session.events]);
   const ventureNames = useMemo(
@@ -94,6 +109,38 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
     briefingRequestId.current += 1;
     setSession((current) => resetSwitchSession(current, Date.now()));
     setBriefingState({ status: "idle" });
+    setCloseoutState({ status: "idle" });
+  }
+
+  async function handleCloseBoards(): Promise<void> {
+    const request = createDailyCloseoutRequest(session, ventures, Date.now());
+    setCloseoutState({ status: "loading", request });
+
+    try {
+      const response = await fetch("/api/daily-closeout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(request),
+      });
+      if (!response.ok) throw new Error("Closeout request failed.");
+
+      const envelope = DailyCloseoutEnvelopeSchema.parse(await response.json());
+      setCloseoutState({ status: "ready", request, envelope });
+    } catch {
+      setCloseoutState({
+        status: "ready",
+        request,
+        envelope: {
+          closeout: createFallbackDailyCloseout(request),
+          source: "fallback",
+          notice: "Network closeout unavailable; showing local fallback.",
+        },
+      });
+    }
+  }
+
+  function handleStartFreshSession(): void {
+    handleReset();
   }
 
   return (
@@ -103,7 +150,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           <p className="eyebrow">Venture lines</p>
           <h2 id="board-title">Choose where your attention goes</h2>
         </div>
-        <p>AI re-entry · v0.4.0</p>
+        <p>Daily closeout · v0.5.0</p>
       </div>
 
       <div className="session-toolbar">
@@ -121,11 +168,62 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
             <span>estimated min</span>
           </div>
         </div>
-        <button className="reset-button" type="button" onClick={handleReset}>
-          Reset session
-        </button>
+        <div className="session-actions">
+          <button className="reset-button" type="button" onClick={handleReset}>
+            Reset session
+          </button>
+          <button className="close-boards-button" type="button" onClick={() => void handleCloseBoards()}>
+            Close the boards
+          </button>
+        </div>
       </div>
 
+      {closeoutState.status !== "idle" ? (
+        <section className="closeout-screen" aria-labelledby="closeout-title" aria-live="polite">
+          <div className="closeout-heading">
+            <div>
+              <p className="eyebrow">End of day</p>
+              <h3 id="closeout-title">The boards are closing</h3>
+            </div>
+            {closeoutState.status === "ready" && (
+              <span className={`briefing-source ${closeoutState.envelope.source}`}>
+                {closeoutState.envelope.source === "ai" ? "AI closeout" : "Safe fallback"}
+              </span>
+            )}
+          </div>
+
+          <div className="closeout-metrics">
+            <div><strong>{closeoutState.request.lines.length}</strong><span>lines visited</span></div>
+            <div><strong>{closeoutState.request.totalSwitches}</strong><span>switches</span></div>
+            <div><strong>{closeoutState.request.coldSwitches}</strong><span>cold</span></div>
+            <div><strong>{closeoutState.request.estimatedMinutes}</strong><span>estimated min</span></div>
+          </div>
+
+          <div className="closeout-lines">
+            {closeoutState.request.lines.map((line) => (
+              <article key={line.ventureId}>
+                <div><h4>{line.ventureName}</h4><span>{line.entries} {line.entries === 1 ? "entry" : "entries"}</span></div>
+                <p>{line.pendingTasks.length} pending {line.pendingTasks.length === 1 ? "item" : "items"}</p>
+              </article>
+            ))}
+          </div>
+
+          {closeoutState.status === "loading" ? (
+            <div className="briefing-loading" role="status"><span aria-hidden="true" />Preparing an honest closeout…</div>
+          ) : (
+            <div className="closeout-narrative">
+              <p>{closeoutState.envelope.closeout.narrative}</p>
+              <blockquote>{closeoutState.envelope.closeout.shutdownPrompt}</blockquote>
+              {closeoutState.envelope.notice && <small>{closeoutState.envelope.notice}</small>}
+            </div>
+          )}
+
+          <button className="fresh-session-button" type="button" onClick={handleStartFreshSession}>
+            Start a fresh session
+          </button>
+        </section>
+      ) : (
+        <>
       <div className="venture-list">
         {ventures.map((venture) => {
           const pendingCount = getPendingTaskCount(venture);
@@ -248,6 +346,8 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           </ol>
         )}
       </section>
+        </>
+      )}
     </section>
   );
 }
