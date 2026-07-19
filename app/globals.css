@@ -228,7 +228,8 @@ h1 {
 .close-boards-button,
 .fresh-session-button,
 .priority-merge-button,
-.back-board-button {
+.back-board-button,
+.demo-workday-button {
   padding: 10px 14px;
   border: 1px solid var(--ink);
   border-radius: 9px;
@@ -246,10 +247,88 @@ h1 {
 .priority-merge-button:hover,
 .priority-merge-button:focus-visible,
 .back-board-button:hover,
-.back-board-button:focus-visible {
+.back-board-button:focus-visible,
+.demo-workday-button:hover:not(:disabled),
+.demo-workday-button:focus-visible {
   background: #28514b;
   outline: 3px solid rgb(240 109 69 / 30%);
   outline-offset: 3px;
+}
+
+.demo-workday-button {
+  border-color: #f0a35e;
+  background: #f0a35e;
+  color: #17322f;
+}
+
+.demo-workday-button:hover:not(:disabled),
+.demo-workday-button:focus-visible {
+  background: #d98c4d;
+  color: #17322f;
+}
+
+.demo-workday-button:disabled {
+  cursor: progress;
+  opacity: 0.72;
+}
+
+.demo-strip {
+  display: grid;
+  grid-template-columns: 1fr minmax(160px, 0.35fr);
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 18px;
+  padding: 14px 18px;
+  border: 1px solid #e1b786;
+  border-radius: 14px;
+  background: #fff1dc;
+}
+
+.demo-strip > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.demo-strip span {
+  color: #a04d33;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.demo-strip strong {
+  font-size: 0.84rem;
+}
+
+.demo-strip progress {
+  width: 100%;
+  height: 8px;
+  border: 0;
+  border-radius: 999px;
+  accent-color: #a04d33;
+  overflow: hidden;
+}
+
+.demo-strip progress::-webkit-progress-bar {
+  border-radius: 999px;
+  background: #ead8bf;
+}
+
+.demo-strip progress::-webkit-progress-value {
+  border-radius: 999px;
+  background: #a04d33;
+  transition: width 200ms ease;
+}
+
+.demo-strip.complete {
+  border-color: #72c8b5;
+  background: #e4f3eb;
+}
+
+.demo-strip.complete span {
+  color: #287555;
 }
 
 .priority-merge-button {
@@ -879,7 +958,8 @@ h1 {
   }
 
   .session-toolbar,
-  .switch-history {
+  .switch-history,
+  .demo-strip {
     grid-template-columns: 1fr;
     align-items: stretch;
     flex-direction: column;

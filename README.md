@@ -51,6 +51,17 @@ for cold entries, and a cold threshold of more than four hours. A first entry in
 seen in the supplied event history is cold; exactly four hours is warm. These values are an
 adjustable planning model—not a scientific measurement of time actually lost.
 
+## Judge demo workday
+
+“Run demo workday” replays the same checked-in fictional event fixture used by
+`pnpm benchmark:switch-cost`. It progresses through nine recorded entries using the normal
+session state and `computeSwitchCost` path, finishing at the independently tested result of
+**6 switches, 2 cold entries, and 74 estimated minutes**.
+
+The completed replay exposes all six measured transitions and remains compatible with priority
+merge and daily closeout. Replay and reset cancel prior progress, and manually plugging into a
+venture leaves demo mode and starts a fresh current-time session.
+
 ## AI re-entry briefings
 
 When a user plugs into a different venture, Switchboard requests a structured landing checklist
@@ -81,7 +92,7 @@ Without credentials—or if the provider fails—the same UI uses deterministic 
 earlier dated work first, undated work last, and source order as the stable tie-breaker. The ranking
 is informational and never completes tasks, sends messages, or changes venture data.
 
-## v0.6.0 scope
+## v0.6.1 scope
 
 - Reproducible Next.js and TypeScript scaffold
 - Typed venture, note, and task domain models
@@ -101,10 +112,12 @@ is informational and never completes tasks, sends messages, or changes venture d
 - Read-only cross-venture ranking of every pending task
 - Explainable AI ordering with strict completeness validation
 - Deterministic deadline fallback with stable tie-breaking
+- One-click fictional judge workday using the shared benchmark fixture
+- Progressive replay with full measured transition history, replay, and reset states
 - CI gates for linting, types, tests, and production build
 - Environment template with no secrets
 
-Persistence is intentionally reserved for later versions. v0.6.0 session data exists only in
+Persistence is intentionally reserved for later versions. v0.6.1 session data exists only in
 the current browser tab and resets when the page reloads.
 
 ## Project structure
