@@ -49,6 +49,12 @@ export type {
   ReentryRequest,
 } from "./reentry-briefing";
 export { getPendingTaskCount, summarizePortfolio } from "./ventures";
+export { explainSwitchCost } from "./measurement-explanation";
+export type {
+  MeasurementClassification,
+  MeasurementExplanation,
+  MeasurementExplanationTransition,
+} from "./measurement-explanation";
 export {
   computeSwitchCost,
   DEFAULT_SWITCH_COST_ASSUMPTIONS,

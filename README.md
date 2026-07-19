@@ -106,7 +106,16 @@ in stable source order. For the fictional judge workday, the recorded baseline i
 36-minute difference is a projected planning estimate—not measured time saved—and the plan never
 changes tasks, calendars, or the active session.
 
-## v0.6.2 scope
+## Measurement explanation
+
+The live estimate now includes a collapsed “Why?” disclosure derived from the same
+`SwitchCostResult` shown in the session metrics. It states the base cost, cold multiplier,
+strict greater-than-four-hour threshold, and first-entry behavior, then attributes a cost and
+warm/cold reason to every measured transition. The contribution sum is shown before the final
+whole-minute rounding step, so the fictional judge workday transparently shows 73.8 minutes
+becoming the displayed 74-minute estimate. A zero-switch session never invents transition rows.
+
+## v0.6.3 scope
 
 - Reproducible Next.js and TypeScript scaffold
 - Typed venture, note, and task domain models
@@ -130,10 +139,12 @@ changes tasks, calendars, or the active session.
 - Progressive replay with full measured transition history, replay, and reset states
 - Validated read-only venture-block planning after fragmented sessions
 - Independently scored baseline/proposal comparison with deterministic fallback
+- Accessible, collapsed measurement formula and per-transition explanation
+- Explicit contribution sum and final display-rounding evidence
 - CI gates for linting, types, tests, and production build
 - Environment template with no secrets
 
-Persistence is intentionally reserved for later versions. v0.6.2 session data exists only in
+Persistence is intentionally reserved for later versions. v0.6.3 session data exists only in
 the current browser tab and resets when the page reloads.
 
 ## Project structure
