@@ -17,6 +17,7 @@ import {
   DailyCloseoutEnvelopeSchema,
   DEMO_WORKDAY_EVENTS,
   evaluateSwitchPlan,
+  explainSwitchCost,
   getPendingTaskCount,
   plugIntoVenture,
   PriorityMergeEnvelopeSchema,
@@ -96,6 +97,10 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
   const [plannerState, setPlannerState] = useState<PlannerState>({ status: "idle" });
   const briefingRequestId = useRef(0);
   const measurement = useMemo(() => computeSwitchCost(session.events), [session.events]);
+  const measurementExplanation = useMemo(
+    () => explainSwitchCost(measurement),
+    [measurement],
+  );
   const ventureNames = useMemo(
     () => new Map(ventures.map((venture) => [venture.id, venture.name])),
     [ventures],
@@ -276,7 +281,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           <p className="eyebrow">Venture lines</p>
           <h2 id="board-title">Choose where your attention goes</h2>
         </div>
-        <p>Switch planner · v0.6.2</p>
+        <p>Measurement explanation · v0.6.3</p>
       </div>
 
       <div className="session-toolbar">
@@ -343,6 +348,74 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           </progress>
         </section>
       )}
+
+      <details className="measurement-explanation">
+        <summary>
+          <span>
+            {measurement.totalSwitches === 0
+              ? "How is the estimate calculated?"
+              : `Why ${measurement.estimatedMinutes} estimated minutes?`}
+          </span>
+          <small>Show formula and transition math</small>
+        </summary>
+        <div className="measurement-explanation-body">
+          <p className="measurement-caveat">
+            This is a planning estimate based on explicit product assumptions—not a scientific
+            measurement of time actually lost.
+          </p>
+          <dl className="measurement-assumptions">
+            <div>
+              <dt>Base cost</dt>
+              <dd>{measurementExplanation.baseReorientationMinutes} min</dd>
+            </div>
+            <div>
+              <dt>Cold multiplier</dt>
+              <dd>{measurementExplanation.coldSwitchMultiplier}×</dd>
+            </div>
+            <div>
+              <dt>Cold threshold</dt>
+              <dd>&gt; {measurementExplanation.coldThresholdMinutes / 60} hours</dd>
+            </div>
+            <div>
+              <dt>First recorded entry</dt>
+              <dd>{measurementExplanation.firstEntryIsCold ? "Cold" : "Base cost"}</dd>
+            </div>
+          </dl>
+
+          {measurementExplanation.transitions.length === 0 ? (
+            <p className="measurement-empty">
+              No venture switches yet. A transition appears here only after you enter a different
+              venture.
+            </p>
+          ) : (
+            <ol className="measurement-transitions">
+              {measurementExplanation.transitions.map((transition, index) => (
+                <li key={`${transition.ventureId}-${index}`}>
+                  <div>
+                    <strong>
+                      {ventureNames.get(transition.fromVentureId) ?? transition.fromVentureId}
+                      <span aria-label="to"> → </span>
+                      {ventureNames.get(transition.ventureId) ?? transition.ventureId}
+                    </strong>
+                    <span className={`measurement-kind ${transition.classification}`}>
+                      {transition.classification.replace("-", " ")}
+                    </span>
+                  </div>
+                  <p>{transition.reason}</p>
+                  <b>{transition.costMinutes} min</b>
+                </li>
+              ))}
+            </ol>
+          )}
+
+          <div className="measurement-total">
+            <span>
+              Contributions before final rounding: {measurementExplanation.contributionMinutes} min
+            </span>
+            <strong>Displayed total: {measurementExplanation.displayedMinutes} min</strong>
+          </div>
+        </div>
+      </details>
 
       {plannerState.status !== "idle" ? (
         <section className="planner-screen" aria-labelledby="planner-title" aria-live="polite">
