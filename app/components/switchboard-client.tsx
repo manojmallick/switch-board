@@ -6,16 +6,20 @@ import {
   computeSwitchCost,
   createDailyCloseoutRequest,
   createFallbackDailyCloseout,
+  createFallbackPriorityMerge,
   createFallbackReentryBriefing,
+  createPriorityMergeRequest,
   createReentryRequest,
   createSwitchSession,
   DailyCloseoutEnvelopeSchema,
   getPendingTaskCount,
   plugIntoVenture,
+  PriorityMergeEnvelopeSchema,
   resetSwitchSession,
   ReentryBriefingEnvelopeSchema,
   type DailyCloseoutEnvelope,
   type DailyCloseoutRequest,
+  type PriorityMergeEnvelope,
   type ReentryBriefingEnvelope,
   type Venture,
 } from "@/src/logic";
@@ -37,6 +41,11 @@ type CloseoutState =
       readonly request: DailyCloseoutRequest;
       readonly envelope: DailyCloseoutEnvelope;
     };
+
+type PriorityState =
+  | { readonly status: "idle" }
+  | { readonly status: "loading" }
+  | { readonly status: "ready"; readonly envelope: PriorityMergeEnvelope };
 
 function formatLastTouched(value: string | null): string {
   if (!value) return "Not touched yet";
@@ -60,6 +69,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
   );
   const [briefingState, setBriefingState] = useState<BriefingState>({ status: "idle" });
   const [closeoutState, setCloseoutState] = useState<CloseoutState>({ status: "idle" });
+  const [priorityState, setPriorityState] = useState<PriorityState>({ status: "idle" });
   const briefingRequestId = useRef(0);
   const measurement = useMemo(() => computeSwitchCost(session.events), [session.events]);
   const ventureNames = useMemo(
@@ -110,6 +120,33 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
     setSession((current) => resetSwitchSession(current, Date.now()));
     setBriefingState({ status: "idle" });
     setCloseoutState({ status: "idle" });
+    setPriorityState({ status: "idle" });
+  }
+
+  async function handleMergePriorities(): Promise<void> {
+    const request = createPriorityMergeRequest(ventures, Date.now());
+    setPriorityState({ status: "loading" });
+
+    try {
+      const response = await fetch("/api/priority-merge", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(request),
+      });
+      if (!response.ok) throw new Error("Priority merge request failed.");
+
+      const envelope = PriorityMergeEnvelopeSchema.parse(await response.json());
+      setPriorityState({ status: "ready", envelope });
+    } catch {
+      setPriorityState({
+        status: "ready",
+        envelope: {
+          result: createFallbackPriorityMerge(request),
+          source: "fallback",
+          notice: "Network ranking unavailable; showing local deadline order.",
+        },
+      });
+    }
   }
 
   async function handleCloseBoards(): Promise<void> {
@@ -150,7 +187,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           <p className="eyebrow">Venture lines</p>
           <h2 id="board-title">Choose where your attention goes</h2>
         </div>
-        <p>Daily closeout · v0.5.0</p>
+        <p>Priority merge · v0.6.0</p>
       </div>
 
       <div className="session-toolbar">
@@ -169,6 +206,9 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           </div>
         </div>
         <div className="session-actions">
+          <button className="priority-merge-button" type="button" onClick={() => void handleMergePriorities()}>
+            Merge priorities
+          </button>
           <button className="reset-button" type="button" onClick={handleReset}>
             Reset session
           </button>
@@ -178,7 +218,50 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
         </div>
       </div>
 
-      {closeoutState.status !== "idle" ? (
+      {priorityState.status !== "idle" ? (
+        <section className="priority-screen" aria-labelledby="priority-title" aria-live="polite">
+          <div className="priority-heading">
+            <div>
+              <p className="eyebrow">Across every line</p>
+              <h3 id="priority-title">One priority signal</h3>
+              <p>A read-only comparison of pending work—not an objective verdict.</p>
+            </div>
+            {priorityState.status === "ready" && (
+              <span className={`briefing-source ${priorityState.envelope.source}`}>
+                {priorityState.envelope.source === "ai" ? "AI ranking" : "Deadline fallback"}
+              </span>
+            )}
+          </div>
+
+          {priorityState.status === "loading" ? (
+            <div className="briefing-loading" role="status">
+              <span aria-hidden="true" />Comparing pending work across ventures…
+            </div>
+          ) : (
+            <>
+              <ol className="priority-ranking">
+                {priorityState.envelope.result.ranked.map((item) => (
+                  <li key={item.taskId}>
+                    <strong>{item.position}</strong>
+                    <div>
+                      <span>{item.ventureName}</span>
+                      <h4>{item.task}</h4>
+                      <p>{item.reason}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              {priorityState.envelope.notice && (
+                <p className="priority-notice">{priorityState.envelope.notice}</p>
+              )}
+            </>
+          )}
+
+          <button className="back-board-button" type="button" onClick={() => setPriorityState({ status: "idle" })}>
+            Back to the switchboard
+          </button>
+        </section>
+      ) : closeoutState.status !== "idle" ? (
         <section className="closeout-screen" aria-labelledby="closeout-title" aria-live="polite">
           <div className="closeout-heading">
             <div>

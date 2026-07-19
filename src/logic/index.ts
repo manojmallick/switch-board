@@ -1,5 +1,20 @@
 export { demoVentures } from "./demo-ventures";
 export {
+  buildPriorityMergeDataPrompt,
+  createFallbackPriorityMerge,
+  createPriorityMergeRequest,
+  isCompletePriorityMerge,
+  PRIORITY_MERGE_SYSTEM_INSTRUCTIONS,
+  PriorityMergeEnvelopeSchema,
+  PriorityMergeRequestSchema,
+  PriorityMergeResultSchema,
+} from "./priority-merge";
+export type {
+  PriorityMergeEnvelope,
+  PriorityMergeRequest,
+  PriorityMergeResult,
+} from "./priority-merge";
+export {
   buildDailyCloseoutDataPrompt,
   createDailyCloseoutRequest,
   createFallbackDailyCloseout,
