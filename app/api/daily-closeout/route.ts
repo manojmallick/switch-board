@@ -3,6 +3,11 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 
 import {
+  assertReadOnlyCapability,
+  type ReadOnlyAiCapability,
+} from "@/src/logic/read-only-guarantee";
+
+import {
   buildDailyCloseoutDataPrompt,
   createFallbackDailyCloseout,
   DAILY_CLOSEOUT_SYSTEM_INSTRUCTIONS,
@@ -14,6 +19,7 @@ import {
 
 const MAX_REQUEST_BYTES = 64_000;
 const DEFAULT_MODEL = "gpt-5.6-sol";
+export const AI_CAPABILITY = "narrate" satisfies ReadOnlyAiCapability;
 
 function fallbackEnvelope(input: DailyCloseoutRequest, notice: string): DailyCloseoutEnvelope {
   return {
@@ -59,6 +65,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const model = process.env.OPENAI_MODEL?.trim() || DEFAULT_MODEL;
 
   try {
+    assertReadOnlyCapability(AI_CAPABILITY);
     const openai = new OpenAI({ apiKey, timeout: 12_000, maxRetries: 1 });
     const response = await openai.responses.parse({
       model,

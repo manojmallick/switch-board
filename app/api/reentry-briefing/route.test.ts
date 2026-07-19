@@ -8,7 +8,11 @@ import {
   ReentryBriefingSchema,
   ReentryBriefingEnvelopeSchema,
 } from "../../../src/logic/reentry-briefing";
-import { POST } from "./route";
+import { AI_CAPABILITY, POST } from "./route";
+
+test("declares the briefing-only AI capability", () => {
+  assert.equal(AI_CAPABILITY, "briefing");
+});
 
 test("missing credentials return a valid deterministic fallback envelope", async () => {
   const priorKey = process.env.OPENAI_API_KEY;

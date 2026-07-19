@@ -9,7 +9,11 @@ import {
   PriorityMergeEnvelopeSchema,
   PriorityMergeResultSchema,
 } from "../../../src/logic/priority-merge";
-import { POST } from "./route";
+import { AI_CAPABILITY, POST } from "./route";
+
+test("declares the rank-only AI capability", () => {
+  assert.equal(AI_CAPABILITY, "rank");
+});
 
 const input = createPriorityMergeRequest(demoVentures, Date.parse("2026-07-19T09:00:00Z"));
 
