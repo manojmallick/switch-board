@@ -92,7 +92,21 @@ Without credentials—or if the provider fails—the same UI uses deterministic 
 earlier dated work first, undated work last, and source order as the stable tie-breaker. The ranking
 is informational and never completes tasks, sends messages, or changes venture data.
 
-## v0.6.1 scope
+## Switch-reduction planner
+
+After a session reaches at least three measured switches, “Plan fewer switches” proposes a
+read-only sequence of venture work blocks. GPT-5.6 may order the blocks, but it cannot supply
+the projected metrics: Switchboard validates that every pending task appears exactly once under
+its original venture, creates one-hour-spaced projected block events, and scores both sequences
+through `computeSwitchCost`.
+
+If credentials or the provider are unavailable, a deterministic fallback groups tasks by venture
+in stable source order. For the fictional judge workday, the recorded baseline is 6 switches and
+74 estimated minutes; the grouped counterfactual is 2 switches and 38 estimated minutes. The
+36-minute difference is a projected planning estimate—not measured time saved—and the plan never
+changes tasks, calendars, or the active session.
+
+## v0.6.2 scope
 
 - Reproducible Next.js and TypeScript scaffold
 - Typed venture, note, and task domain models
@@ -114,10 +128,12 @@ is informational and never completes tasks, sends messages, or changes venture d
 - Deterministic deadline fallback with stable tie-breaking
 - One-click fictional judge workday using the shared benchmark fixture
 - Progressive replay with full measured transition history, replay, and reset states
+- Validated read-only venture-block planning after fragmented sessions
+- Independently scored baseline/proposal comparison with deterministic fallback
 - CI gates for linting, types, tests, and production build
 - Environment template with no secrets
 
-Persistence is intentionally reserved for later versions. v0.6.1 session data exists only in
+Persistence is intentionally reserved for later versions. v0.6.2 session data exists only in
 the current browser tab and resets when the page reloads.
 
 ## Project structure
