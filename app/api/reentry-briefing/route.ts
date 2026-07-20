@@ -23,10 +23,11 @@ export const AI_CAPABILITY = "briefing" satisfies ReadOnlyAiCapability;
 function fallbackEnvelope(
   input: Parameters<typeof createFallbackReentryBriefing>[0],
   notice: string,
+  source: ReentryBriefingEnvelope["source"] = "fallback",
 ): ReentryBriefingEnvelope {
   return {
     briefing: createFallbackReentryBriefing(input),
-    source: "fallback",
+    source,
     notice,
   };
 }
@@ -60,7 +61,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      fallbackEnvelope(parsed.data, "Demo briefing: OPENAI_API_KEY is not configured."),
+      fallbackEnvelope(
+        parsed.data,
+        "GPT-5.6-style mock using fictional demo data; no API call was made.",
+        "mock",
+      ),
     );
   }
 

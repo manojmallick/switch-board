@@ -1,4 +1,4 @@
-# Switchboard v0.7.0 submission candidate
+# Switchboard v0.7.1 submission candidate
 
 This document separates repository-verifiable evidence from submission work that still requires
 a person or an external service. It is not a claim that the Devpost submission has been filed.
@@ -31,7 +31,7 @@ four hours, and cold treatment for the first recorded entry into a venture.
   provider boundary. It rejects write-like capabilities such as completing tasks, sending
   messages, scheduling events, or deleting notes.
 - The repository history records the work as small issue-linked milestones from v0.1.0 through
-  v0.7.0. The final Codex `/feedback` session identifier must be captured separately.
+  v0.7.1. The final Codex `/feedback` session identifier must be captured separately.
 
 ## Real implementation challenges
 
@@ -92,4 +92,4 @@ back to stable grouping.
 - [ ] Verify the repository visibility and submit before the deadline.
 
 The final `v1.0.0` tag is additionally blocked on the public-artifact and manual checks in
-[`RELEASE_V1.md`](./RELEASE_V1.md). Until those checks pass, version 0.7.0 is intentional.
+[`RELEASE_V1.md`](./RELEASE_V1.md). Until those checks pass, version 0.7.1 is intentional.
