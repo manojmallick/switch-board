@@ -22,10 +22,14 @@ const MAX_REQUEST_BYTES = 64_000;
 const DEFAULT_MODEL = "gpt-5.6-sol";
 export const AI_CAPABILITY = "rank" satisfies ReadOnlyAiCapability;
 
-function fallbackEnvelope(input: PriorityMergeRequest, notice: string): PriorityMergeEnvelope {
+function fallbackEnvelope(
+  input: PriorityMergeRequest,
+  notice: string,
+  source: PriorityMergeEnvelope["source"] = "fallback",
+): PriorityMergeEnvelope {
   return {
     result: createFallbackPriorityMerge(input),
-    source: "fallback",
+    source,
     notice,
   };
 }
@@ -59,7 +63,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      fallbackEnvelope(parsed.data, "Demo ranking: OPENAI_API_KEY is not configured."),
+      fallbackEnvelope(
+        parsed.data,
+        "GPT-5.6-style mock using fictional demo data; no API call was made.",
+        "mock",
+      ),
     );
   }
 

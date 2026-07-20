@@ -42,14 +42,14 @@ visible and measures the transitions between those contexts.
 
 ## Honest Status
 
-Switchboard is a **v0.7.0 submission candidate and functional prototype**.
+Switchboard is a **v0.7.1 submission candidate and functional prototype**.
 
 | Area | Current status |
 |---|---|
 | Data | Three fictional ventures, notes, and task lists are checked into the repository. |
 | Persistence | None. Session events live in React state and reset on reload. The Supabase variables are reserved but unused. |
 | Authentication | None. The generated wrapper configuration explicitly sets authentication to `none`. |
-| AI | Optional. Without `OPENAI_API_KEY`, every AI-assisted flow returns a deterministic fallback. |
+| AI | Optional. Without `OPENAI_API_KEY`, every assisted flow returns a clearly labeled, deterministic GPT-5.6-style mock. No provider call is made. |
 | Measurement | A product planning model, not a scientific measurement of productivity loss. Assumptions are explicit in code and UI. |
 | Demo | A fixed fictional workday can be replayed. Run `pnpm benchmark:switch-cost` to reproduce its result. |
 | Release | The `v1.0.0` tag is intentionally blocked until the final live application and public video pass [`RELEASE_V1.md`](./RELEASE_V1.md). |
@@ -82,6 +82,7 @@ flowchart LR
     Guard["Read-Only Guarantee"]
     OpenAI["OpenAI Responses API\nstructured output"]
     ValidateOut{"Output complete and valid?"}
+    Mock["Highlighted GPT-5.6-style mock\nno API call"]
     Fallback["Deterministic fallback"]
   end
 
@@ -100,10 +101,11 @@ flowchart LR
   ValidateIn -- "No" --> Error["400 / 413 response"]
   ValidateIn -- "Yes" --> HasKey
   Env --> HasKey
-  HasKey -- "No" --> Fallback
+  HasKey -- "No" --> Mock
   HasKey -- "Yes" --> Guard --> OpenAI --> ValidateOut
   ValidateOut -- "No" --> Fallback
   ValidateOut -- "Yes" --> Assisted
+  Mock --> Assisted
   Fallback --> Assisted
   Assisted --> UI
 ```
@@ -125,7 +127,8 @@ receive additional completeness and identity checks before the UI accepts them.
    assumptions, classification reason, contribution sum, and final whole-minute rounding.
 5. **Use optional read-only assistance.** The user can merge pending priorities, request a
    lower-switch block plan after at least three measured switches, or close the boards. Each flow
-   uses structured output when OpenAI is configured and deterministic fallback logic otherwise.
+   uses structured output when OpenAI is configured, a highlighted GPT-5.6-style mock when the key
+   is absent, and deterministic fallback logic after a real network or provider failure.
 6. **Replay the fixture when needed.** “Run demo workday” replays the fixed nine-entry fictional
    event stream through the normal session and measurement code. It does not call OpenAI by itself.
 
@@ -178,7 +181,7 @@ Never prefix the API key with `NEXT_PUBLIC_`; that would expose it to browser co
 | Variable | Default | Purpose |
 |---|---:|---|
 | `NEXT_PUBLIC_SITE_URL` | `https://example.com` when unset; `.env.example` uses `http://localhost:3000` | Base URL for generated metadata. Set it to the deployed canonical URL in production. |
-| `OPENAI_API_KEY` | Unset | Server-only credential for the four optional OpenAI Responses API routes. Unset selects deterministic fallbacks. |
+| `OPENAI_API_KEY` | Unset | Server-only credential for the four optional OpenAI Responses API routes. Unset selects clearly labeled GPT-5.6-style mocks without a provider call. |
 | `OPENAI_MODEL` | `gpt-5.6-sol` | Model used by re-entry, priority merge, switch planner, and daily closeout routes. |
 | `NEXT_PUBLIC_SUPABASE_URL` | Unset and unused | Reserved for a future persistence milestone. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Unset and unused | Reserved for a future persistence milestone. |
@@ -231,8 +234,8 @@ switch-board/
 - The public demo uses only fictional records from `src/logic/demo-ventures.ts`.
 - Session events remain in browser memory. There is no database write, cookie, user account, or
   persistence layer in the current implementation.
-- Without `OPENAI_API_KEY`, AI-assisted flows use deterministic local/server fallbacks and do not
-  contact OpenAI.
+- Without `OPENAI_API_KEY`, assisted flows return deterministic GPT-5.6-style mock envelopes and
+  do not contact OpenAI. The UI highlights their source as `GPT-5.6 mock`.
 - With `OPENAI_API_KEY`, the selected venture notes/tasks or session summary are sent from the
   browser to the corresponding server route and then to the configured OpenAI model.
 - Inputs are size-limited, schema-validated, wrapped as untrusted data, and governed by the

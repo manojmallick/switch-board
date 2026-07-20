@@ -17,7 +17,7 @@ test("declares the rank-only AI capability", () => {
 
 const input = createPriorityMergeRequest(demoVentures, Date.parse("2026-07-19T09:00:00Z"));
 
-test("missing credentials return a complete deterministic ranking", async () => {
+test("missing credentials return a complete GPT-5.6-style mock ranking", async () => {
   const priorKey = process.env.OPENAI_API_KEY;
   delete process.env.OPENAI_API_KEY;
 
@@ -31,7 +31,8 @@ test("missing credentials return a complete deterministic ranking", async () => 
     const body = PriorityMergeEnvelopeSchema.parse(await response.json());
 
     assert.equal(response.status, 200);
-    assert.equal(body.source, "fallback");
+    assert.equal(body.source, "mock");
+    assert.match(body.notice ?? "", /GPT-5\.6-style mock.*no API call/i);
     assert.equal(isCompletePriorityMerge(input, body.result), true);
   } finally {
     if (priorKey) process.env.OPENAI_API_KEY = priorKey;

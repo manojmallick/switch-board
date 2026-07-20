@@ -80,6 +80,16 @@ function formatSwitchDifference(value: number): string {
   return `${Math.abs(value)} ${value > 0 ? "fewer" : "more"} switches`;
 }
 
+function formatSourceLabel(
+  source: "ai" | "mock" | "fallback",
+  aiLabel: string,
+  fallbackLabel: string,
+): string {
+  if (source === "ai") return aiLabel;
+  if (source === "mock") return "GPT-5.6 mock";
+  return fallbackLabel;
+}
+
 export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }) {
   const initialVenture = ventures.find((venture) => venture.activity === "active") ?? ventures[0];
 
@@ -281,7 +291,7 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           <p className="eyebrow">Venture lines</p>
           <h2 id="board-title">Choose where your attention goes</h2>
         </div>
-        <p>Submission candidate · v0.7.0</p>
+        <p>Submission candidate · v0.7.1</p>
       </div>
 
       <div className="session-toolbar">
@@ -427,7 +437,11 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
             </div>
             {plannerState.status === "ready" && (
               <span className={`briefing-source ${plannerState.envelope.source}`}>
-                {plannerState.envelope.source === "ai" ? "AI sequence" : "Grouped fallback"}
+                {formatSourceLabel(
+                  plannerState.envelope.source,
+                  "AI sequence",
+                  "Grouped fallback",
+                )}
               </span>
             )}
           </div>
@@ -490,7 +504,11 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
             </div>
             {priorityState.status === "ready" && (
               <span className={`briefing-source ${priorityState.envelope.source}`}>
-                {priorityState.envelope.source === "ai" ? "AI ranking" : "Deadline fallback"}
+                {formatSourceLabel(
+                  priorityState.envelope.source,
+                  "AI ranking",
+                  "Deadline fallback",
+                )}
               </span>
             )}
           </div>
@@ -532,7 +550,11 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
             </div>
             {closeoutState.status === "ready" && (
               <span className={`briefing-source ${closeoutState.envelope.source}`}>
-                {closeoutState.envelope.source === "ai" ? "AI closeout" : "Safe fallback"}
+                {formatSourceLabel(
+                  closeoutState.envelope.source,
+                  "AI closeout",
+                  "Safe fallback",
+                )}
               </span>
             )}
           </div>
@@ -620,7 +642,11 @@ export function SwitchboardClient({ ventures }: { ventures: readonly Venture[] }
           </div>
           {briefingState.status === "ready" && (
             <span className={`briefing-source ${briefingState.envelope.source}`}>
-              {briefingState.envelope.source === "ai" ? "AI briefing" : "Safe fallback"}
+              {formatSourceLabel(
+                briefingState.envelope.source,
+                "AI briefing",
+                "Safe fallback",
+              )}
             </span>
           )}
         </div>

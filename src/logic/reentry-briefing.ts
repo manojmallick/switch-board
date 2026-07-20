@@ -45,7 +45,7 @@ export const ReentryBriefingSchema = z
 export const ReentryBriefingEnvelopeSchema = z
   .object({
     briefing: ReentryBriefingSchema,
-    source: z.enum(["ai", "fallback"]),
+    source: z.enum(["ai", "mock", "fallback"]),
     model: z.string().trim().min(1).max(100).optional(),
     notice: z.string().trim().min(1).max(300).optional(),
   })

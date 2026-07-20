@@ -1,7 +1,7 @@
 # v1.0.0 release gate
 
 Do not change the package version, create a `v1.0.0` tag, push a tag, or publish a GitHub release
-until every item below is complete. The v0.7.0 submission candidate remains the truthful version
+until every item below is complete. The v0.7.1 submission candidate remains the truthful version
 while public artifacts are pending.
 
 ## 1. Automated public-artifact check
@@ -38,7 +38,7 @@ the release evidence.
 
 After merging the final evidence update into `main`, use the repository's release workflow to:
 
-1. change the package and visible product version from 0.7.0 to 1.0.0;
+1. change the package and visible product version from 0.7.1 to 1.0.0;
 2. run `pnpm verify` and the benchmark again;
 3. commit the verified release evidence and version change;
 4. create annotated tag `v1.0.0` on that exact `main` commit;

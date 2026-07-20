@@ -14,7 +14,7 @@ test("declares the briefing-only AI capability", () => {
   assert.equal(AI_CAPABILITY, "briefing");
 });
 
-test("missing credentials return a valid deterministic fallback envelope", async () => {
+test("missing credentials return a clearly labeled GPT-5.6-style mock", async () => {
   const priorKey = process.env.OPENAI_API_KEY;
   delete process.env.OPENAI_API_KEY;
 
@@ -28,7 +28,8 @@ test("missing credentials return a valid deterministic fallback envelope", async
     const body = ReentryBriefingEnvelopeSchema.parse(await response.json());
 
     assert.equal(response.status, 200);
-    assert.equal(body.source, "fallback");
+    assert.equal(body.source, "mock");
+    assert.match(body.notice ?? "", /GPT-5\.6-style mock.*no API call/i);
     assert.equal(body.briefing.topPriorities.length, 3);
   } finally {
     if (priorKey) process.env.OPENAI_API_KEY = priorKey;

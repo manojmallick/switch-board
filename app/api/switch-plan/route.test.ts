@@ -17,7 +17,7 @@ test("declares the plan-only AI capability", () => {
 
 const input = createSwitchPlannerRequest(createDemoWorkdaySession(), demoVentures);
 
-test("missing credentials return an independently scored fallback plan", async () => {
+test("missing credentials return an independently scored GPT-5.6-style mock plan", async () => {
   const priorKey = process.env.OPENAI_API_KEY;
   delete process.env.OPENAI_API_KEY;
 
@@ -31,7 +31,8 @@ test("missing credentials return an independently scored fallback plan", async (
     const body = SwitchPlannerEnvelopeSchema.parse(await response.json());
 
     assert.equal(response.status, 200);
-    assert.equal(body.source, "fallback");
+    assert.equal(body.source, "mock");
+    assert.match(body.notice ?? "", /GPT-5\.6-style mock.*no API call/i);
     assert.equal(body.result.baseline.estimatedMinutes, 74);
     assert.equal(body.result.proposed.estimatedMinutes, 38);
     assert.equal(body.result.projectedMinuteDifference, 36);

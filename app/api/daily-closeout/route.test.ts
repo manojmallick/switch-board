@@ -23,7 +23,7 @@ function validRequest() {
   );
 }
 
-test("missing credentials return a valid deterministic closeout", async () => {
+test("missing credentials return a valid GPT-5.6-style mock closeout", async () => {
   const priorKey = process.env.OPENAI_API_KEY;
   delete process.env.OPENAI_API_KEY;
 
@@ -37,7 +37,8 @@ test("missing credentials return a valid deterministic closeout", async () => {
     const body = DailyCloseoutEnvelopeSchema.parse(await response.json());
 
     assert.equal(response.status, 200);
-    assert.equal(body.source, "fallback");
+    assert.equal(body.source, "mock");
+    assert.match(body.notice ?? "", /GPT-5\.6-style mock.*no API call/i);
     assert.match(body.closeout.narrative, /no completion is inferred/i);
   } finally {
     if (priorKey) process.env.OPENAI_API_KEY = priorKey;

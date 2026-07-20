@@ -21,10 +21,14 @@ const MAX_REQUEST_BYTES = 64_000;
 const DEFAULT_MODEL = "gpt-5.6-sol";
 export const AI_CAPABILITY = "narrate" satisfies ReadOnlyAiCapability;
 
-function fallbackEnvelope(input: DailyCloseoutRequest, notice: string): DailyCloseoutEnvelope {
+function fallbackEnvelope(
+  input: DailyCloseoutRequest,
+  notice: string,
+  source: DailyCloseoutEnvelope["source"] = "fallback",
+): DailyCloseoutEnvelope {
   return {
     closeout: createFallbackDailyCloseout(input),
-    source: "fallback",
+    source,
     notice,
   };
 }
@@ -58,7 +62,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      fallbackEnvelope(parsed.data, "Demo closeout: OPENAI_API_KEY is not configured."),
+      fallbackEnvelope(
+        parsed.data,
+        "GPT-5.6-style mock using fictional demo data; no API call was made.",
+        "mock",
+      ),
     );
   }
 

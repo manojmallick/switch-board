@@ -720,6 +720,13 @@ h1 {
   color: #23634e;
 }
 
+.briefing-source.mock {
+  border-color: #aab5ff;
+  background: #e8eaff;
+  color: #35418f;
+  box-shadow: 0 0 0 3px rgb(126 146 245 / 14%);
+}
+
 .briefing-source.fallback {
   background: #f4e4ce;
   color: #81472f;

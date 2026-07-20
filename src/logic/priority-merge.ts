@@ -53,7 +53,7 @@ export const PriorityMergeResultSchema = z
 export const PriorityMergeEnvelopeSchema = z
   .object({
     result: PriorityMergeResultSchema,
-    source: z.enum(["ai", "fallback"]),
+    source: z.enum(["ai", "mock", "fallback"]),
     model: z.string().trim().min(1).max(100).optional(),
     notice: z.string().trim().min(1).max(300).optional(),
   })
