@@ -19,6 +19,7 @@ for OpenAI Build Week 2026 from the firsthand problem of running multiple ventur
 - [Honest Status](#honest-status)
 - [Architecture](#architecture)
 - [How It Works](#how-it-works)
+- [Built with Codex and GPT-5.6](#built-with-codex-and-gpt-56)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
 - [Project Structure](#project-structure)
@@ -141,6 +142,57 @@ pnpm benchmark:switch-cost
 # Run lint, TypeScript, tests, and a production build
 pnpm verify
 ```
+
+## Built with Codex and GPT-5.6
+
+### How Codex was used
+
+Codex carried the project from product plan to a deployed submission candidate in one traceable
+engineering session. It reviewed the initial idea, split the build into versioned milestones,
+implemented each milestone on an issue-linked branch, wrote tests, diagnosed the first CI failure,
+prepared release documentation, and deployed the resulting Next.js application. The required
+`/feedback` provenance value for that work is:
+
+```text
+019f74c9-1371-75a3-976e-45923e093dde
+```
+
+Repository-verifiable evidence is collected in [`GPT56_EVIDENCE.md`](./GPT56_EVIDENCE.md).
+
+### Important decisions made with Codex
+
+| Decision | Result in the shipped project |
+|---|---|
+| Measure the checked-in fixture instead of repeating an aspirational headline | The product reports the fixture's reproducible `6 switches / 2 cold / 74 minutes`. |
+| Keep the success metric outside the model | AI may propose a venture order; `computeSwitchCost` validates and scores it locally. |
+| Define the four-hour boundary precisely | A return is cold only when time away is strictly greater than four hours. |
+| Make every assisted path safe without credentials | Missing credentials select a clearly labeled deterministic mock; provider failures select deterministic fallback logic. |
+| Keep AI read-only | The provider boundary permits briefing, ranking, planning, and narration—not task completion, messaging, scheduling, or data mutation. |
+
+### Precise GPT-5.6 contribution
+
+GPT-5.6 in Codex was used for the engineering work captured by the session ID above. Its most
+important product contribution was shaping and implementing the **measurement spine**: the
+deterministic switch-cost estimator, its edge-case semantics, the fixed workday fixture, the
+human-readable `73.8 → 74` explanation, and the rule that AI-generated plans are scored by local
+code rather than by the model's own claims. The same session then integrated that spine into the
+re-entry, priority, planning, closeout, test, CI, documentation, and deployment flows.
+
+This is separate from runtime model use. The server routes support `OPENAI_MODEL=gpt-5.6-sol`
+when a server-side `OPENAI_API_KEY` is configured. The public credential-free demo does **not**
+make that API call; it displays conspicuously labeled `GPT-5.6 mock` responses. Those mock
+responses are demo fixtures, not evidence of a live GPT-5.6 response.
+
+### Test without rebuilding
+
+Judges can open the deployed sandbox at
+[`https://switch-board-vert.vercel.app`](https://switch-board-vert.vercel.app). No account, API
+key, test credentials, or local build is required. Click **Run demo workday**, expand **Why 74
+estimated minutes?**, then try a venture switch, priority merge, switch-reduction plan, and daily
+closeout. Assisted cards are intentionally marked `GPT-5.6 mock` in this credential-free build.
+
+For a local audit, follow [Quick Start](#quick-start), then run `pnpm benchmark:switch-cost` and
+`pnpm verify`.
 
 ## Quick Start
 

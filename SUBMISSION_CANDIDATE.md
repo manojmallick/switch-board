@@ -3,6 +3,8 @@
 This document separates repository-verifiable evidence from submission work that still requires
 a person or an external service. It is not a claim that the Devpost submission has been filed.
 
+Devpost project draft: <https://devpost.com/software/switchboard-7e154f>
+
 ## Proven product claim
 
 The checked-in fictional workday produces **6 venture switches, 2 cold entries, and a
@@ -31,7 +33,7 @@ four hours, and cold treatment for the first recorded entry into a venture.
   provider boundary. It rejects write-like capabilities such as completing tasks, sending
   messages, scheduling events, or deleting notes.
 - The repository history records the work as small issue-linked milestones from v0.1.0 through
-  v0.7.1. The final Codex `/feedback` session identifier must be captured separately.
+  v0.7.1. Codex `/feedback` session: `019f74c9-1371-75a3-976e-45923e093dde`.
 
 ## Real implementation challenges
 
@@ -84,10 +86,10 @@ back to stable grouping.
 
 ## Manual submission checklist
 
-- [ ] Deploy the final `main` commit and paste the public URL into Devpost.
+- [x] Deploy the final `main` commit: <https://switch-board-vert.vercel.app>.
 - [ ] Test the public URL in a signed-out browser and on a phone.
 - [ ] Record and upload a demo of no more than three minutes.
-- [ ] Run `/feedback` and add the real Codex session identifier to Devpost.
+- [x] Capture `/feedback` session identifier: `019f74c9-1371-75a3-976e-45923e093dde`.
 - [ ] Select **Work & Productivity** and confirm all required Devpost fields.
 - [ ] Verify the repository visibility and submit before the deadline.
 
