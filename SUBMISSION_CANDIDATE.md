@@ -5,6 +5,13 @@ a person or an external service. It is not a claim that the Devpost submission h
 
 Devpost project draft: <https://devpost.com/software/switchboard-7e154f>
 
+| Required submission answer | Value |
+|---|---|
+| Submitter type | Individual |
+| Country of residence | Netherlands |
+| Category | Work & Productivity |
+| `/feedback` session ID | `019f74c9-1371-75a3-976e-45923e093dde` |
+
 ## Proven product claim
 
 The checked-in fictional workday produces **6 venture switches, 2 cold entries, and a
