@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 1536 1024">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#17322f"/>
+    </marker>
+    <style>
+      .title{font-family:Arial,sans-serif;font-size:54px;font-weight:700;fill:#17322f}.sub{font-family:Arial,sans-serif;font-size:25px;font-weight:400;fill:#4b5f5a}
+      .layer{font-family:Arial,sans-serif;font-size:25px;font-weight:700;fill:#17322f}.node{font-family:Arial,sans-serif;font-size:23px;font-weight:600;fill:#17322f}
+      .small{font-family:Arial,sans-serif;font-size:19px;font-weight:400;fill:#4b5f5a}.box{stroke:#17322f;stroke-width:3;rx:20}
+      .line{fill:none;stroke:#17322f;stroke-width:5;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1536" height="1024" fill="#f7f2e8"/>
+  <text x="88" y="88" class="title">Switchboard architecture</text>
+  <text x="88" y="130" class="sub">Fictional work signals → deterministic measurement → validated read-only assistance</text>
+
+  <rect x="70" y="190" width="300" height="680" fill="#fbe6de" stroke="#f06d45" stroke-width="4" rx="28"/>
+  <text x="100" y="238" class="layer">📥 Inputs</text>
+  <rect x="100" y="285" width="240" height="120" fill="#fffaf5" class="box"/>
+  <text x="220" y="330" text-anchor="middle" class="node">Fictional ventures</text><text x="220" y="365" text-anchor="middle" class="small">notes · tasks · status</text>
+  <rect x="100" y="455" width="240" height="120" fill="#fffaf5" class="box"/>
+  <text x="220" y="500" text-anchor="middle" class="node">User actions</text><text x="220" y="535" text-anchor="middle" class="small">switch · replay · plan</text>
+  <rect x="100" y="625" width="240" height="120" fill="#fffaf5" class="box"/>
+  <text x="220" y="670" text-anchor="middle" class="node">Server environment</text><text x="220" y="705" text-anchor="middle" class="small">optional OpenAI key</text>
+
+  <rect x="455" y="190" width="430" height="680" fill="#e9f1ec" stroke="#7aa68f" stroke-width="4" rx="28"/>
+  <text x="485" y="238" class="layer">🧭 Browser + measurement</text>
+  <rect x="500" y="285" width="340" height="105" fill="#ffffff" class="box"/>
+  <text x="670" y="330" text-anchor="middle" class="node">Next.js + React UI</text><text x="670" y="362" text-anchor="middle" class="small">one in-memory session</text>
+  <rect x="500" y="450" width="340" height="105" fill="#ffffff" class="box"/>
+  <text x="670" y="495" text-anchor="middle" class="node">computeSwitchCost</text><text x="670" y="527" text-anchor="middle" class="small">deterministic estimator</text>
+  <rect x="500" y="615" width="340" height="105" fill="#ffffff" class="box"/>
+  <text x="670" y="660" text-anchor="middle" class="node">explainSwitchCost</text><text x="670" y="692" text-anchor="middle" class="small">assumptions · ledger · rounding</text>
+  <path d="M670 390 V450" class="line"/><path d="M670 555 V615" class="line"/>
+
+  <rect x="970" y="190" width="496" height="680" fill="#fff4cf" stroke="#d5a84b" stroke-width="4" rx="28"/>
+  <text x="1000" y="238" class="layer">🔒 Validated assistance + outputs</text>
+  <rect x="1015" y="285" width="405" height="105" fill="#ffffff" class="box"/>
+  <text x="1218" y="328" text-anchor="middle" class="node">4 schema-validated API routes</text><text x="1218" y="360" text-anchor="middle" class="small">brief · rank · plan · narrate</text>
+  <polygon points="1218,430 1395,520 1218,610 1041,520" fill="#fffaf0" stroke="#17322f" stroke-width="3"/>
+  <text x="1218" y="510" text-anchor="middle" class="node">OPENAI_API_KEY?</text><text x="1218" y="544" text-anchor="middle" class="small">provider or honest mock</text>
+  <rect x="1015" y="665" width="405" height="105" fill="#ffffff" class="box"/>
+  <text x="1218" y="705" text-anchor="middle" class="node">Measured + assisted outputs</text><text x="1218" y="738" text-anchor="middle" class="small">metrics · explanation · briefing · plan</text>
+  <path d="M1218 390 V430" class="line"/><path d="M1218 610 V665" class="line"/>
+
+  <path d="M370 345 H500" class="line"/><path d="M370 515 H500" class="line"/><path d="M370 685 C420 685 430 337 500 337" class="line"/>
+  <path d="M840 500 H1015" class="line"/>
+  <path d="M840 667 C905 667 920 337 1015 337" class="line"/>
+  <text x="915" y="475" text-anchor="middle" class="small">local metrics</text>
+  <text x="768" y="945" text-anchor="middle" class="sub">AI proposes structure. Local deterministic code validates identities and scores outcomes.</text>
+</svg>

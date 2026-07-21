@@ -19,6 +19,7 @@ for OpenAI Build Week 2026 from the firsthand problem of running multiple ventur
 - [Honest Status](#honest-status)
 - [Architecture](#architecture)
 - [How It Works](#how-it-works)
+- [How It Looks](#how-it-looks)
 - [Built with Codex and GPT-5.6](#built-with-codex-and-gpt-56)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
@@ -132,6 +133,30 @@ receive additional completeness and identity checks before the UI accepts them.
    is absent, and deterministic fallback logic after a real network or provider failure.
 6. **Replay the fixture when needed.** “Run demo workday” replays the fixed nine-entry fictional
    event stream through the normal session and measurement code. It does not call OpenAI by itself.
+
+## How It Looks
+
+The screenshots below follow the public, credential-free judge path. Assisted cards explicitly
+identify `GPT-5.6 mock` data and state when no provider call was made.
+
+<table>
+  <tr>
+    <td width="50%"><img src="./public/submission/screenshots/01-overview.png" alt="Switchboard portfolio overview" /><br /><strong>Portfolio overview</strong><br />Three fictional venture lines, one active context, pending work, and the read-only boundary.</td>
+    <td width="50%"><img src="./public/submission/screenshots/02-measured-workday.png" alt="Measured fictional workday" /><br /><strong>Measured workday</strong><br />The fixed fixture produces 6 switches, 2 cold entries, and 74 estimated minutes.</td>
+  </tr>
+  <tr>
+    <td><img src="./public/submission/screenshots/03-measurement-explanation.png" alt="Switch-cost explanation" /><br /><strong>Inspectable measurement</strong><br />Explicit assumptions, transition classifications, contribution sum, and final rounding.</td>
+    <td><img src="./public/submission/screenshots/04-switch-reduction-planner.png" alt="Switch-reduction planner" /><br /><strong>Switch-reduction planner</strong><br />A read-only counterfactual scored locally with the same deterministic estimator.</td>
+  </tr>
+  <tr>
+    <td><img src="./public/submission/screenshots/05-priority-merge.png" alt="Cross-venture priority merge" /><br /><strong>One priority signal</strong><br />Every pending item appears exactly once with venture identity preserved.</td>
+    <td><img src="./public/submission/screenshots/06-reentry-briefing.png" alt="Venture re-entry briefing" /><br /><strong>Re-entry briefing</strong><br />Since-you-left context, three items to inspect, and one immediate focus.</td>
+  </tr>
+  <tr>
+    <td><img src="./public/submission/screenshots/07-daily-closeout.png" alt="Daily closeout" /><br /><strong>Daily closeout</strong><br />Visited lines, measured switching, remaining work, and a shutdown prompt.</td>
+    <td><img src="./public/submission/architecture.png" alt="Switchboard architecture" /><br /><strong>Architecture</strong><br />Fictional inputs flow through deterministic measurement and validated read-only assistance.</td>
+  </tr>
+</table>
 
 ### Measure, do not claim
 
